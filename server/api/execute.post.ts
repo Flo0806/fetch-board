@@ -1,3 +1,5 @@
+import { logger } from '../utils/logger.js'
+
 export default defineEventHandler(async (event) => {
   const body = await readBody(event)
   const { url, method, headers, body: requestBody, transform } = body
@@ -21,11 +23,11 @@ export default defineEventHandler(async (event) => {
     if (transform && transform.trim()) {
       try {
         // Create a function that takes response and returns transformed data
-        // eslint-disable-next-line no-new-func
-        const transformFn = new Function('response', `return ${transform}`)
+        const transformFn = new Function('response', `return (\n${transform}\n)`) // \n important for comments
         return transformFn(response)
       }
       catch (transformError) {
+        logger.error('Transform error:', transformError)
         throw createError({
           statusCode: 400,
           message: `Transform error: ${transformError instanceof Error ? transformError.message : 'Unknown error'}`,
