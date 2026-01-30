@@ -2,32 +2,25 @@ export default defineEventHandler(async (event) => {
   const storage = useStorage('data')
   const id = getRouterParam(event, 'id')
   const body = await readBody(event)
+  const storageKey = getUserStorageKey(event, 'dashboard:widgets', id!)
 
   if (!id) {
-    throw createError({
-      statusCode: 400,
-      message: 'Query ID is required',
-    })
+    throw createError({ statusCode: 400, message: 'ID required' })
   }
 
-  const storageKey = getUserStorageKey(event, 'queries', id)
   const existing = await storage.getItem<Record<string, unknown>>(storageKey)
-
   if (!existing) {
-    throw createError({
-      statusCode: 404,
-      message: 'Query not found',
-    })
+    throw createError({ statusCode: 404, message: 'Widget not found' })
   }
 
-  const updated = {
+  const widget = {
     ...existing,
     ...body,
-    id, // Ensure ID cannot be changed
+    id,
     updatedAt: new Date().toISOString(),
   }
 
-  await storage.setItem(storageKey, updated)
+  await storage.setItem(storageKey, widget)
 
-  return updated
+  return widget
 })

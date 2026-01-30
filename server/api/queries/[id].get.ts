@@ -9,7 +9,8 @@ export default defineEventHandler(async (event): Promise<Query> => {
     })
   }
 
-  const query = await storage.getItem<Query>(`queries:${id}`)
+  const storageKey = getUserStorageKey(event, 'queries', id)
+  const query = await storage.getItem<Query>(storageKey)
 
   if (!query) {
     throw createError({

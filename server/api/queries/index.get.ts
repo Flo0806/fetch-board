@@ -1,7 +1,8 @@
-export default defineEventHandler(async (): Promise<Query[]> => {
+export default defineEventHandler(async (event): Promise<Query[]> => {
   const storage = useStorage('data')
+  const storagePrefix = getUserStorageKey(event, 'queries')
 
-  const keys = await storage.getKeys('queries')
+  const keys = await storage.getKeys(storagePrefix)
 
   const queries = await Promise.all(
     keys.map(key => storage.getItem<Query>(key)),

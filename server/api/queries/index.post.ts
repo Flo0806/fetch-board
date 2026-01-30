@@ -3,6 +3,7 @@ import { randomUUID } from 'node:crypto'
 export default defineEventHandler(async (event) => {
   const storage = useStorage('data')
   const body = await readBody(event)
+  const storagePrefix = getUserStorageKey(event, 'queries')
 
   const { name, url, method, headers, body: requestBody, transform, display } = body
 
@@ -29,7 +30,7 @@ export default defineEventHandler(async (event) => {
     updatedAt: now,
   }
 
-  await storage.setItem(`queries:${id}`, query)
+  await storage.setItem(`${storagePrefix}:${id}`, query)
 
   return query
 })

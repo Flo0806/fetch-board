@@ -9,7 +9,8 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const existing = await storage.getItem(`queries:${id}`)
+  const storageKey = getUserStorageKey(event, 'queries', id)
+  const existing = await storage.getItem(storageKey)
 
   if (!existing) {
     throw createError({
@@ -18,7 +19,7 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  await storage.removeItem(`queries:${id}`)
+  await storage.removeItem(storageKey)
 
   return { success: true }
 })
