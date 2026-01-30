@@ -1,4 +1,4 @@
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async (event): Promise<Query> => {
   const storage = useStorage('data')
   const id = getRouterParam(event, 'id')
 
@@ -9,7 +9,7 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const query = await storage.getItem(`queries:${id}`)
+  const query = await storage.getItem<Query>(`queries:${id}`)
 
   if (!query) {
     throw createError({

@@ -1,6 +1,4 @@
-export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE'
-
-export type DisplayType = 'card' | 'table' | 'list' | 'raw'
+import type { DisplayType } from './queries.js'
 
 export interface DisplayConfig {
   type: DisplayType
@@ -14,19 +12,6 @@ export interface DisplayConfig {
   // List options
   itemPath?: string
   itemTemplate?: string
-}
-
-export interface Query {
-  id: string
-  name: string
-  url: string
-  method: HttpMethod
-  headers?: Record<string, string>
-  body?: string
-  transform?: string
-  display: DisplayConfig
-  createdAt: string
-  updatedAt: string
 }
 
 export interface DashboardWidget {
