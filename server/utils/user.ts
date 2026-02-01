@@ -1,18 +1,16 @@
 import type { H3Event } from 'h3'
 
-// Placeholder user ID for development (will be replaced with GitHub auth)
-const DEV_USER_ID = 'dev-user'
-
 /**
  * Get the current user ID from session
- * TODO: Replace with actual GitHub OAuth session lookup
  */
-export function getUserId(_event: H3Event): string {
-  // Later: const session = await getUserSession(event)
-  // return session?.user?.id || throw unauthorized error
+export async function getUserId(event: H3Event): Promise<string> {
+  const session = await getUserSession(event)
 
-  // For now: return dev user ID
-  return DEV_USER_ID
+  if (!session?.user?.id) {
+    throw createError({ statusCode: 401, message: 'Not authenticated' })
+  }
+
+  return session.user.id
 }
 
 /**

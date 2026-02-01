@@ -6,6 +6,8 @@ export default defineNuxtConfig({
     '@nuxt/image',
     '@nuxt/test-utils',
     '@nuxt/ui',
+    'nuxt-auth-utils',
+    '@pinia/nuxt',
   ],
   devtools: { enabled: true },
   css: ['~/assets/css/main.css'],
