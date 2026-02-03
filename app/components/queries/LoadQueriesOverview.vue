@@ -1,11 +1,11 @@
 <template>
   <UPageList>
     <UAlert
-      v-if="error"
+      v-if="queriesStore.error"
       title="Error!"
       description="Cannot load queries."
       icon="i-lucide-circle-x"
-      class="text-white"
+      class="text-white w-full"
       color="error"
       :ui="{
         icon: 'size-11',
@@ -13,7 +13,7 @@
     />
     <template v-else>
       <div
-        v-if="pending"
+        v-if="queriesStore.loading"
         class="flex items-center gap-4"
       >
         <div class="grid gap-2">
@@ -21,31 +21,47 @@
           <USkeleton class="h-4 w-62.5" />
         </div>
       </div>
-      <UPageCard
+      <div
         v-for="(query, index) in queries"
         v-else
         :key="index"
-        variant="ghost"
-        class="cursor-pointer"
+        class="flex gap-4 items-center justify-between p-3 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-800 cursor-pointer"
         @click="emits('select-query', query.id)"
       >
-        <template #body>
-          <UUser
-            :name="query.name"
-            :description="new Date(query.createdAt).toLocaleString()"
-            size="xl"
-            class="relative"
+        <div class="flex-1 min-w-0">
+          <div class="truncate">
+            {{ query.name }}
+          </div>
+          <div class="text-xs text-neutral-500">
+            {{ new Date(query.createdAt).toLocaleString() }}
+          </div>
+        </div>
+        <UButton
+          variant="ghost"
+          color="neutral"
+          size="sm"
+          @click.stop="emits('delete-query', query.id)"
+        >
+          <UIcon
+            class="text-red-500 size-5"
+            name="i-heroicons-trash"
           />
-        </template>
-      </UPageCard>
+        </UButton>
+      </div>
     </template>
   </UPageList>
 </template>
 
 <script setup lang="ts">
-const { data: queries, pending, error } = useFetch('/api/queries')
+// const { data: queries, pending, error } = useFetch('/api/queries')
 
+const queriesStore = useQueriesStore()
+const queries = storeToRefs(queriesStore).queries
+
+onMounted(() => {
+  queriesStore.fetchQueries()
+})
 const emits = defineEmits<{
-  (e: 'select-query', queryId: string): void
+  (e: 'delete-query' | 'select-query', queryId: string): void
 }>()
 </script>

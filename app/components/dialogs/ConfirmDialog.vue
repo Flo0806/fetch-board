@@ -14,12 +14,14 @@ const emit = defineEmits<{ close: [boolean] }>()
     :close="{ onClick: () => emit('close', false) }"
     :title="title"
   >
-    <p
-      v-if="content"
-      class="text-muted"
-    >
-      {{ content }}
-    </p>
+    <template #body>
+      <p
+        v-if="content"
+        class="text-muted"
+      >
+        {{ content }}
+      </p>
+    </template>
 
     <template #footer>
       <div class="flex w-full justify-end gap-2">
