@@ -14,9 +14,16 @@ export interface DisplayConfig {
   itemTemplate?: string
 }
 
+export interface WidgetField {
+  key: string
+  value: string
+  isPath: boolean
+}
+
 export interface DashboardWidget {
   id: string
-  queryId: string
+  type: 'card' | 'table' | 'list' | 'raw'
   size: 6 | 12
-  order: number
+  position: number
+  fields: WidgetField[]
 }

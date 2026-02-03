@@ -7,6 +7,8 @@ definePageMeta({
   title: 'Query Builder',
 })
 
+const queriesStore = useQueriesStore()
+
 const overlay = useOverlay()
 const confirmDialog = overlay.create(ConfirmDialog)
 
@@ -84,18 +86,29 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
         headerObj[h.key] = h.value
     })
 
-    await $fetch('/api/queries', {
-      method: 'POST',
-      body: {
+    if (loadedQueryId.value) {
+      // Update existing query
+      await queriesStore.updateQuery(loadedQueryId.value, {
         ...event.data,
         headers: headerObj,
         body: state.body,
         transform: state.transform,
         display: state.display,
-      },
+      })
+
+      return
+    }
+    // Create new query
+    const result = await queriesStore.createQuery({
+      ...event.data,
+      headers: headerObj,
+      body: state.body,
+      transform: state.transform,
+      display: state.display,
     })
 
-    navigateTo('/')
+    if (result)
+      navigateTo('/')
   }
   catch (err) {
     console.error('Failed to save query:', err)
@@ -140,18 +153,39 @@ async function onSelectQuery(queryId: string) {
   // Check if current data is dirty
   if (isDirty.value) {
     const confirmed = await confirmDialog.open({
-      title: 'Ungespeicherte Änderungen',
-      content: 'Du hast ungespeicherte Änderungen. Wirklich neue Daten laden?',
-      confirmLabel: 'Laden',
-      cancelLabel: 'Abbrechen',
+      title: 'Unsaved Changes',
+      content: 'You have unsaved changes. Do you really want to load new data?',
+      confirmLabel: 'Load',
+      cancelLabel: 'Cancel',
     })
 
     if (!confirmed) return
   }
 
   // Load query details
-  const query = await $fetch<Query>(`/api/queries/${queryId}`)
-  loadQueryData(query)
+  const query = await queriesStore.getQueryById(queryId)
+  if (query)
+    loadQueryData(query)
+}
+
+async function onDeleteQuery(queryId: string) {
+  const confirmed = await confirmDialog.open({
+    title: 'Delete Query',
+    content: 'Are you sure you want to delete this query?',
+    confirmLabel: 'Delete',
+    cancelLabel: 'Cancel',
+  })
+
+  if (!confirmed) return
+
+  if (!(await queriesStore.deleteQuery(queryId)))
+    return
+
+  // Reset state to defaults
+  Object.assign(state, initialState())
+  headers.value = []
+  loadedQueryId.value = null
+  savedSnapshot.value = ''
 }
 </script>
 
@@ -194,7 +228,10 @@ async function onSelectQuery(queryId: string) {
               <span class="font-medium">Existing Queries</span>
             </template>
             <div class="space-y-4">
-              <QueriesLoadQueriesOverview @select-query="onSelectQuery" />
+              <QueriesLoadQueriesOverview
+                @select-query="onSelectQuery"
+                @delete-query="onDeleteQuery"
+              />
             </div>
           </UCard>
 

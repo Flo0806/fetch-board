@@ -1,17 +1,3 @@
-export interface WidgetField {
-  key: string
-  value: string
-  isPath: boolean
-}
-
-export interface DashboardWidget {
-  id: string
-  type: 'card' | 'table' | 'list' | 'raw'
-  size: 6 | 12
-  position: number
-  fields: WidgetField[]
-}
-
 export const useDashboardStore = defineStore('dashboard', () => {
   const widgets = ref<DashboardWidget[]>([])
   const loading = ref(false)
