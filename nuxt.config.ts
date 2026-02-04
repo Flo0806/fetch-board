@@ -8,6 +8,7 @@ export default defineNuxtConfig({
     '@nuxt/ui',
     'nuxt-auth-utils',
     '@pinia/nuxt',
+    'nuxt-freeform',
   ],
   devtools: { enabled: true },
   css: ['~/assets/css/main.css'],
